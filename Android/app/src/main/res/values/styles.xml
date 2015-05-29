@@ -1,10 +1,10 @@
 <resources>
 
-    <style title="AppTheme" parent="android:Theme.Material">
-        <item title="android:colorPrimary">@color/deep_orange_400</item>
-        <item title="android:colorPrimaryDark">@color/deep_orange_700</item>
-        <item title="android:colorAccent">@color/deep_orange_400</item>
-        <item title="android:windowBackground">@color/white</item>
+    <style name="AppTheme" parent="android:Theme.Material">
+        <item name="android:colorPrimary">@color/deep_orange_400</item>
+        <item name="android:colorPrimaryDark">@color/deep_orange_700</item>
+        <item name="android:colorAccent">@color/deep_orange_400</item>
+        <item name="android:windowBackground">@color/white</item>
 
     </style>
 
