@@ -1,0 +1,7 @@
+<resources>
+    <string title="app_name">MeetingAssistant</string>
+
+    <string title="hello_world">Hello world!</string>
+    <string title="action_settings">Settings</string>
+    <string title="title_activity_add_event">AddEventActivity</string>
+</resources>
