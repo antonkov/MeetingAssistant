@@ -117,11 +117,57 @@ public class MainActivity extends AppCompatActivity {
                 }, 1000);
                 break;
             case 1:
-                eventAdapter.notifyItemInserted(0);
-                recList.scrollToPosition(0);
+                if (resultCode == 1) {
+                    updateIdOfNewEvent();
+                    eventAdapter.notifyItemInserted(0);
+                    recList.scrollToPosition(0);
+                }
                 break;
-
         }
+    }
+
+    private void updateIdOfNewEvent() {
+        final SwipeRefreshLayout swipeLayout = (SwipeRefreshLayout) findViewById(R.id.swipeToRefreshLayout);
+        RestClientHelper.getEvents("grtkachenko@gmail.com", new JsonHttpResponseHandler() {
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                swipeLayout.setRefreshing(false);
+            }
+
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, JSONArray timeline) {
+                swipeLayout.setRefreshing(false);
+                for (int i = 0; i < timeline.length(); i++) {
+                    try {
+                        JSONObject event = timeline.getJSONObject(i);
+                        String id = event.getString("id");
+                        boolean have = false;
+                        for (EventInfo eventInfo : eventInfos) {
+                            if (id.equals(eventInfo.id)) {
+                                have = true;
+                                break;
+                            }
+                        }
+                        if (!have) {
+                            for (EventInfo eventInfo : eventInfos) {
+                                if (eventInfo.id == null) {
+                                    eventInfo.id = id;
+                                    break;
+                                }
+                            }
+                            break;
+                        }
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
+                super.onFailure(statusCode, headers, throwable, errorResponse);
+            }
+        });
     }
 
     private void updateContent() {

@@ -10,7 +10,7 @@ import java.util.List;
  * Created by gtkachenko on 29/05/15.
  */
 public class EventInfo implements Parcelable {
-    public final String id;
+    public String id;
     public final String title;
     public final String date;
     public final List<String> attendants;

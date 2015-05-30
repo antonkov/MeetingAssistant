@@ -79,7 +79,9 @@ public class EventInfoActivity extends AppCompatActivity {
                         final ProgressDialog pd = new ProgressDialog(EventInfoActivity.this);
                         pd.setMessage("Uploading audio...");
                         pd.show();
-                        RestClientHelper.uploadAudio(EventInfoActivity.this, MainActivity.userEmail, new File(fileName), new AsyncHttpResponseHandler() {
+                        String id = MainActivity.eventInfos.get(getIntent().getIntExtra("event_id", 0)).id;
+
+                        RestClientHelper.uploadAudio(EventInfoActivity.this, id, new File(fileName), new AsyncHttpResponseHandler() {
                             @Override
                             public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
                                 pd.cancel();
