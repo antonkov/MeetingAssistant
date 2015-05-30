@@ -13,7 +13,9 @@ public class Event {
     private String date;
     private byte[] audio;
     private String text;
+    private List<Integer> offsets;
     private List<String> users;
+    private Boolean hasAudio = false;
 
     public String getId() {
         return id;
@@ -59,5 +61,20 @@ public class Event {
         this.users = users;
     }
 
+    public Boolean getHasAudio() {
+        return hasAudio;
+    }
+
+    public void setHasAudio(Boolean hasAudio) {
+        this.hasAudio = hasAudio;
+    }
+
+    public List<Integer> gglolOffsets() {
+        return offsets;
+    }
+
+    public void sslolOffsets(List<Integer> offsets) {
+        this.offsets = offsets;
+    }
 }
 

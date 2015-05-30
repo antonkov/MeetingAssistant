@@ -8,8 +8,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.python.util.PythonInterpreter;
 
-import java.io.FileNotFoundException;
-import java.io.PrintWriter;
+import java.io.*;
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -28,14 +28,6 @@ public class EventRestController {
     @RequestMapping(method=RequestMethod.GET, value="{id}")
     public @ResponseBody Event handleGetEvent(@PathVariable String id){
         return repository.findOne(id);
-    }
-
-    @RequestMapping(method=RequestMethod.GET, value="/audio")
-    public @ResponseBody String handleHasAudio(@RequestParam(value = "id") String id){
-        Event event = repository.findOne(id);
-        if(event == null)
-            throw new ResourceNotFoundException();
-        return Boolean.toString(event.getAudio()!=null);
     }
 
     @RequestMapping(method=RequestMethod.GET)
@@ -61,17 +53,30 @@ public class EventRestController {
             throw new ResourceNotFoundException();
         if(event.getAudio() != null) {
             update.setAudio(event.getAudio());
-//            try {
-//                PrintWriter pw = new PrintWriter("a.txt");
-//            } catch (FileNotFoundException e) {
-//                e.printStackTrace();
-//            }
-//            PythonInterpreter interpreter = new PythonInterpreter();
-//            interpreter.exec("import main");
-//            PyObject someFunc = interpreter.get("sound_to_text");
-//            PyTuple result = (PyTuple) someFunc.__call__(new PyByteArray(event.getAudio()));
-//            Object[] tmp = result.toArray();
-//            System.out.println((String) tmp[1]);
+            update.setHasAudio(true);
+            try {
+                DataOutputStream os = new DataOutputStream(new FileOutputStream("./audio.dat"));
+                os.write(event.getAudio());
+                os.close();
+
+                Process p = Runtime.getRuntime().exec("python sound_to_text.py audio.dat res.txt");
+                p.waitFor();
+                BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream("res.txt")));
+                String text = br.readLine();
+                String[] soffs = br.readLine().split(" ");
+                ArrayList<Integer> offs = new ArrayList<>();
+                for (String off : soffs) offs.add(Integer.parseInt(off));
+                update.setText(text);
+                update.sslolOffsets(offs);
+            } catch (IOException | InterruptedException e) {
+                e.printStackTrace();
+            }
+            PythonInterpreter interpreter = new PythonInterpreter();
+            interpreter.exec("import .");
+            PyObject someFunc = interpreter.get("sound_to_text");
+            PyTuple result = (PyTuple) someFunc.__call__(new PyByteArray(event.getAudio()));
+            Object[] tmp = result.toArray();
+            System.out.println((String) tmp[1]);
         }
         if(event.getDate() != null)
             update.setDate(event.getDate());
