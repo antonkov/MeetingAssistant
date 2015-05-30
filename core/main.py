@@ -42,18 +42,29 @@ def parse_content(content):
     return offs, words
 
 text_filename = 'test.txt'
-sound_filename = 'test.mp4'
-#recognize_and_dump(sound_filename, text_filename)
-content = read_text(text_filename)['result']['document']
-offs, words = parse_content(content)
-print(offs, '\n', words)
-content = ' '.join(words)
-print(content)
 
-result = asyncpostrequest('deletefromtextindex', data={'index': 'logs', 'delete_all_documents':True}, files={})
+def develope():
+    sound_filename = 'test.mp4'
+    #recognize_and_dump(sound_filename, text_filename)
+    content = read_text(text_filename)['result']['document']
+    offs, words = parse_content(content)
+    print(offs, '\n', words)
+    content = ' '.join(words)
+    print(content)
+    print(len(content))
 
-result = asyncpostrequest('addtotextindex', data={'index': 'logs'}, files={'file': text_filename})
-print(result.json())
+#result = asyncpostrequest('deletefromtextindex', data={'index': 'logs', 'delete_all_documents':True}, files={})
+#result = asyncpostrequest('addtotextindex', data={'index': 'logs'}, files={'file': text_filename})
+#result = asyncpostrequest('extractconcepts', data={'reference': 'file'})
 
-#result = asyncpostrequest('extractconcepts', data={'reference': '1'})
-#print(result)
+def sound_to_text(sound_blob):
+    files = {'file': sound_blob}
+    res = asyncpostrequest('recognizespeech', data={'interval': 0}, files=files).json()['actions'][0]
+    json.dump(res, open(text_filename, 'w'))
+    offs, words = parse_content(res['result']['document'])
+    #print(offs, '\n', words)
+    content = ' '.join(words)
+    return offs, content
+
+offs, content = sound_to_text(open('test.mp4', 'rb'))
+print(offs, '\n', content)
