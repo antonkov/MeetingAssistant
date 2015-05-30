@@ -69,10 +69,16 @@ def sound_to_text(sound_blob):
 offs, content = sound_to_text(open('test.mp4', 'rb'))
 print(offs, '\n', content)
 
-def find_start(offs, text, word):
-    for o, w in zip(offs, text.split(' ')):
-        if w == word:
-            return o
-    return -1
+def find_start(offs, text, phrase):
+    phrase_words = phrase.split(' ')
+    k = len(phrase_words)
 
-print(find_start(offs, content, 'to'))
+    res = []
+    text = text.split(' ')
+    for i, (o, w) in enumerate(zip(offs, text)):
+        if phrase_words[0] == w:
+            if ' '.join(text[i:i+k]) == phrase:
+                res.append(o)
+    return res
+
+print(find_start(offs, content, 'this is'))
