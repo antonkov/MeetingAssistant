@@ -68,3 +68,11 @@ def sound_to_text(sound_blob):
 
 offs, content = sound_to_text(open('test.mp4', 'rb'))
 print(offs, '\n', content)
+
+def find_start(offs, text, word):
+    for o, w in zip(offs, text.split(' ')):
+        if w == word:
+            return o
+    return -1
+
+print(find_start(offs, content, 'to'))
