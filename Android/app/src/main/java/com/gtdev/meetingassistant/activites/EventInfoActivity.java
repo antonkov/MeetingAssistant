@@ -108,9 +108,7 @@ public class EventInfoActivity extends AppCompatActivity {
                         .useDefaultUi((android.view.ViewGroup) findViewById(R.id.playerLayout), getLayoutInflater());
             }
         });
-        initViews((EventInfo) getIntent().getParcelableExtra("test"));
-
-
+        initViews(MainActivity.eventInfos.get(getIntent().getIntExtra("event_id", 0)));
     }
 
     private void initViews(EventInfo eventInfo) {

@@ -13,6 +13,7 @@ import android.widget.Toast;
 
 import com.fourmob.datetimepicker.date.DatePickerDialog;
 import com.gtdev.meetingassistant.R;
+import com.gtdev.meetingassistant.model.EventInfo;
 import com.gtdev.meetingassistant.utils.RestClientHelper;
 import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.sleepbot.datetimepicker.time.RadialPickerLayout;
@@ -89,7 +90,7 @@ public class AddEventActivity extends AppCompatActivity implements DatePickerDia
             @Override
             public boolean onMenuItemClick(MenuItem item) {
                 StringTokenizer stringTokenizer = new StringTokenizer(usersEditTExt.getText().toString());
-                List<String> users = new ArrayList<String>();
+                final List<String> users = new ArrayList<String>();
                 while (stringTokenizer.hasMoreTokens()) {
                     users.add(stringTokenizer.nextToken());
                 }
@@ -98,19 +99,25 @@ public class AddEventActivity extends AppCompatActivity implements DatePickerDia
                     @Override
                     public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
                         Toast.makeText(AddEventActivity.this, "Success " + statusCode, Toast.LENGTH_SHORT).show();
+                        goToMainActivity(users);
                     }
 
                     @Override
                     public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error) {
                         Toast.makeText(AddEventActivity.this, "Failure " + statusCode, Toast.LENGTH_SHORT).show();
+                        goToMainActivity(users);
                     }
                 });
-                setResult(1, null);
-                AddEventActivity.this.onBackPressed();
                 return true;
             }
         });
         return super.onCreateOptionsMenu(menu);
+    }
+
+    private void goToMainActivity(List<String> users) {
+        MainActivity.eventInfos.add(0, new EventInfo(null, titleTextView.getText().toString(), dateTextView.getText().toString(), users, false));
+        setResult(1, null);
+        AddEventActivity.this.onBackPressed();
     }
 
     @Override

@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
@@ -26,25 +27,25 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
-
-import jp.wasabeef.recyclerview.animators.SlideInLeftAnimator;
 
 
 public class MainActivity extends AppCompatActivity {
 
     private static final String KEY_EMAIL = "email";
     protected static String userEmail;
-    private static List<EventInfo> eventInfos = new ArrayList<>();
+    public static List<EventInfo> eventInfos = new ArrayList<>();
     private EmptyRecyclerView recList;
     private final EventAdapter eventAdapter = new EventAdapter(eventInfos, new View.OnClickListener() {
         @Override
         public void onClick(View v) {
             Intent intent = new Intent(MainActivity.this, EventInfoActivity.class);
-            intent.putExtra("test", eventInfos.get(recList.getChildAdapterPosition(v)));
+            intent.putExtra("event_id", recList.getChildAdapterPosition(v));
             startActivity(intent);
         }
     });
+    private LinearLayoutManager llm;
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -71,14 +72,16 @@ public class MainActivity extends AppCompatActivity {
         });
         recList = (EmptyRecyclerView) findViewById(R.id.eventList);
         recList.setHasFixedSize(true);
-        LinearLayoutManager llm = new LinearLayoutManager(this);
+        llm = new LinearLayoutManager(this);
         llm.setOrientation(LinearLayoutManager.VERTICAL);
         recList.setLayoutManager(llm);
 
-
         recList.setEmptyView(findViewById(R.id.empty_view));
         recList.setAdapter(eventAdapter);
-        recList.setItemAnimator(new SlideInLeftAnimator());
+        recList.getItemAnimator().setAddDuration(1000);
+        recList.getItemAnimator().setRemoveDuration(1000);
+        recList.getItemAnimator().setMoveDuration(1000);
+        recList.getItemAnimator().setChangeDuration(1000);
 
         final SwipeRefreshLayout swipeLayout = (SwipeRefreshLayout) findViewById(R.id.swipeToRefreshLayout);
         swipeLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
@@ -105,12 +108,17 @@ public class MainActivity extends AppCompatActivity {
                 editor.putString(KEY_EMAIL, data.getStringExtra("email"));
                 userEmail = data.getStringExtra("email");
                 editor.commit();
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        ((SwipeRefreshLayout) findViewById(R.id.swipeToRefreshLayout)).setRefreshing(true);
+                        updateContent();
+                    }
+                }, 1000);
                 break;
             case 1:
-                if (resultCode == 1) {
-                    ((SwipeRefreshLayout) findViewById(R.id.swipeToRefreshLayout)).setRefreshing(true);
-                    updateContent();
-                }
+                eventAdapter.notifyItemInserted(0);
+                recList.scrollToPosition(0);
                 break;
 
         }
@@ -134,17 +142,18 @@ public class MainActivity extends AppCompatActivity {
                         String id = event.getString("id");
                         String title = event.getString("title");
                         String date = event.getString("date");
+                        boolean hasAudio = event.getBoolean("hasAudio");
                         List<String> users = new ArrayList<String>();
                         JSONArray usersJson = event.getJSONArray("users");
                         for (int j = 0; j < usersJson.length(); j++) {
                             users.add(usersJson.getString(j));
                         }
-                        eventInfos.add(new EventInfo(id, title, date, users, i % 2 == 0));
-
+                        eventInfos.add(new EventInfo(id, title, date, users, hasAudio));
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
                 }
+                Collections.reverse(eventInfos);
                 eventAdapter.notifyDataSetChanged();
 
             }
