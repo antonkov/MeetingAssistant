@@ -18,7 +18,10 @@
         </activity>
         <activity
             android:name=".AddEventActivity"
-            android:label="@string/title_activity_add_event"></activity>
+            android:label="@string/title_activity_add_event" />
+        <activity
+            android:name=".EventInfoActivity"
+            android:label="@string/title_activity_event_info"></activity>
     </application>
 
 </manifest>

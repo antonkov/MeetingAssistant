@@ -6,4 +6,5 @@
     <string name="action_save">Save</string>
 
     <string name="title_activity_add_event">AddEventActivity</string>
+    <string name="title_activity_event_info">EventInfoActivity</string>
 </resources>

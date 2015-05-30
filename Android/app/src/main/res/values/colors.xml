@@ -318,6 +318,8 @@
 
     <!-- Black -->
     <color name="black">#000000</color>
+    <color name="semi_transparent_black">#83000000</color>
+
     <!-- Black -->
 
     <!-- White -->

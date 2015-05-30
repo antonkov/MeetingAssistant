@@ -13,8 +13,10 @@ import java.util.List;
  */
 public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHolder> {
     private final List<EventInfo> eventInfoList;
+    private final View.OnClickListener onClickListener;
 
-    public EventAdapter(List<EventInfo> eventInfoList) {
+    public EventAdapter(List<EventInfo> eventInfoList, View.OnClickListener onClickListener) {
+        this.onClickListener = onClickListener;
         this.eventInfoList = eventInfoList;
     }
 
@@ -22,7 +24,7 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHol
     public EventViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View itemView = LayoutInflater.from(parent.getContext()).
                 inflate(R.layout.event_card, parent, false);
-
+        itemView.setOnClickListener(onClickListener);
         return new EventViewHolder(itemView);
     }
 

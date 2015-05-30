@@ -1,6 +1,5 @@
 package com.gtdev.meetingassistant;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
@@ -21,7 +20,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import jp.wasabeef.recyclerview.animators.SlideInLeftAnimator;
-import jp.wasabeef.recyclerview.animators.adapters.AlphaInAnimationAdapter;
 import jp.wasabeef.recyclerview.animators.adapters.AnimationAdapter;
 import jp.wasabeef.recyclerview.animators.adapters.ScaleInAnimationAdapter;
 
@@ -61,7 +59,13 @@ public class MainActivity extends AppCompatActivity {
             EventInfo eventInfo = new EventInfo(null, null, null);
             eventInfos.add(eventInfo);
         }
-        EventAdapter eventAdapter = new EventAdapter(eventInfos);
+        EventAdapter eventAdapter = new EventAdapter(eventInfos, new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(MainActivity.this, EventInfoActivity.class));
+
+            }
+        });
         AnimationAdapter alphaAdapter = new ScaleInAnimationAdapter(eventAdapter);
         recList.setAdapter(eventAdapter);
         recList.setItemAnimator(new SlideInLeftAnimator());
@@ -71,7 +75,8 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onRefresh() {
                 new Handler().postDelayed(new Runnable() {
-                    @Override public void run() {
+                    @Override
+                    public void run() {
                         swipeLayout.setRefreshing(false);
                         SnackbarManager.show(
                                 Snackbar.with(MainActivity.this)
@@ -82,7 +87,6 @@ public class MainActivity extends AppCompatActivity {
             }
         });
         swipeLayout.setColorSchemeResources(android.R.color.holo_red_light);
-
 
     }
 }
