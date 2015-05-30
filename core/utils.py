@@ -41,33 +41,27 @@ def parse_content(content):
         words.append(item['content'])
     return offs, words
 
-text_filename = 'test.txt'
 
 def develope():
-    sound_filename = 'test.mp4'
+    pass
     #recognize_and_dump(sound_filename, text_filename)
-    content = read_text(text_filename)['result']['document']
-    offs, words = parse_content(content)
-    print(offs, '\n', words)
-    content = ' '.join(words)
-    print(content)
-    print(len(content))
+    #content = read_text(text_filename)['result']['document']
+    #offs, words = parse_content(content)
+   # print(offs, '\n', words)
+    #content = ' '.join(words)
+    #print(content)
+    #print(len(content))
 
-#result = asyncpostrequest('deletefromtextindex', data={'index': 'logs', 'delete_all_documents':True}, files={})
-#result = asyncpostrequest('addtotextindex', data={'index': 'logs'}, files={'file': text_filename})
-#result = asyncpostrequest('extractconcepts', data={'reference': 'file'})
-
-def sound_to_text(sound_blob):
-    files = {'file': sound_blob}
+def sound_to_text(sound_filename, text_filename):
+    files = {'file': open(sound_filename, 'rb')}
     res = asyncpostrequest('recognizespeech', data={'interval': 0}, files=files).json()['actions'][0]
-    json.dump(res, open(text_filename, 'w'))
     offs, words = parse_content(res['result']['document'])
-    #print(offs, '\n', words)
-    content = ' '.join(words)
-    return offs, content
-
-offs, content = sound_to_text(open('test.mp4', 'rb'))
-print(offs, '\n', content)
+    with open(text_filename, 'w') as f:
+        f.write(' '.join(words))
+        f.write('\n')
+        for o in offs:
+            f.write(str(o))
+            f.write(' ')
 
 def find_start(offs, text, phrase):
     phrase_words = phrase.split(' ')
@@ -81,4 +75,10 @@ def find_start(offs, text, phrase):
                 res.append(o)
     return res
 
-print(find_start(offs, content, 'this is'))
+#offs, content = sound_to_text(open('test.mp4', 'rb'))
+#print(offs, '\n', content)
+
+
+#result = asyncpostrequest('deletefromtextindex', data={'index': 'logs', 'delete_all_documents':True}, files={})
+#result = asyncpostrequest('addtotextindex', data={'index': 'logs'}, files={'file': text_filename})
+#result = asyncpostrequest('extractconcepts', data={'reference': 'file'})
