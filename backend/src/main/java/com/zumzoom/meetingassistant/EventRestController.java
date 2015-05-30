@@ -31,11 +31,16 @@ public class EventRestController {
     public @ResponseBody Event handleUpdateEvent(@PathVariable String id,
                                                   @RequestBody Event event){
         Event update = repository.findOne(id);
-        update.setAudio(event.getAudio());
-        update.setDate(event.getDate());
-        update.setText(event.getText());
-        update.setTitle(event.getTitle());
-        update.setUsers(event.getUsers());
+        if(event.getAudio() != null)
+            update.setAudio(event.getAudio());
+        if(event.getDate() != null)
+            update.setDate(event.getDate());
+        if(event.getText() != null)
+            update.setText(event.getText());
+        if(event.getTitle() != null)
+            update.setTitle(event.getTitle());
+        if(event.getUsers() != null)
+            update.setUsers(event.getUsers());
         return repository.save(update);
     }
 }

@@ -15,6 +15,10 @@ public class Event {
     private String text;
     private List<String> users;
 
+    public String getId() {
+        return id;
+    }
+
     public String getTitle() {
         return title;
     }
