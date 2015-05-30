@@ -63,17 +63,29 @@ def sound_to_text(sound_filename, text_filename):
             f.write(str(o))
             f.write(' ')
 
-def find_start(offs, text, phrase):
+def find_start(text_filename, phrase, result_filename):
+    offs, text = [], []
+    with open(text_filename, 'r') as f:
+        for w in f.readline().split(' '):
+            text.append(w)
+        mp = f.readline().split(' ')
+        for o in mp:
+            if o.isnumeric():
+                offs.append(int(o))
+
     phrase_words = phrase.split(' ')
     k = len(phrase_words)
 
     res = []
-    text = text.split(' ')
     for i, (o, w) in enumerate(zip(offs, text)):
         if phrase_words[0] == w:
             if ' '.join(text[i:i+k]) == phrase:
                 res.append(o)
-    return res
+    with open(result_filename, 'w') as f:
+        for x in res:
+            f.write(str(x))
+            f.write(' ')
+        f.write('\n')
 
 #offs, content = sound_to_text(open('test.mp4', 'rb'))
 #print(offs, '\n', content)
