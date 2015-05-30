@@ -13,8 +13,9 @@ public class EventRestController {
     private EventRepository repository;
 
     @RequestMapping(method=RequestMethod.GET)
-    public @ResponseBody List<Event> handleGetEvent(@RequestParam("user") String user){
-        return repository.findEventsByUser(user);
+    public @ResponseBody List<Event> handleGetEvent(@RequestParam(value = "user") String user,
+                                                    @RequestParam(value = "data", required = false) Boolean data){
+        return repository.findEventsByUser(user, data==null ? 1 : 0, data==null ? 1 : 0);
     }
 
     @RequestMapping(method=RequestMethod.POST)
