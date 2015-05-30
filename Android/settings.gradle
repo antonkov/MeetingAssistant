@@ -1,1 +1,2 @@
+include ':androidRecording', ':recording'
 include ':app'

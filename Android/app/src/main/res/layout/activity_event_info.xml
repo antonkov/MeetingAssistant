@@ -11,16 +11,63 @@
         android:elevation="4dp"
         android:transitionName="actionBar" />
 
-    <FrameLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="asdasdasdasdasdasdasdasd"
-            android:textColor="@android:color/black" />
-    </FrameLayout>
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/scrollView">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:text="Large Text"
+                android:textColor="@android:color/black"
+                android:textSize="30dp"
+                android:id="@+id/title" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:text="Medium Text"
+                android:layout_marginBottom="14dp"
+                android:textColor="@android:color/darker_gray"
+                android:id="@+id/date" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:id="@+id/attendants" />
+
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Record"
+                android:id="@+id/recordButton" />
+
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Play"
+                android:id="@+id/playButton"
+                android:visibility="gone"/>
+
+
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:id="@+id/playerLayout"
+                android:layout_height="match_parent"></FrameLayout>
+
+        </LinearLayout>
+
+    </ScrollView>
 
 
 </LinearLayout>

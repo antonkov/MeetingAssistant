@@ -49,21 +49,52 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(new Intent(MainActivity.this, AddEventActivity.class));
             }
         });
-        RecyclerView recList = (RecyclerView) findViewById(R.id.eventList);
+        final RecyclerView recList = (RecyclerView) findViewById(R.id.eventList);
         recList.setHasFixedSize(true);
         LinearLayoutManager llm = new LinearLayoutManager(this);
         llm.setOrientation(LinearLayoutManager.VERTICAL);
         recList.setLayoutManager(llm);
-        List<EventInfo> eventInfos = new ArrayList<>();
+        final List<EventInfo> eventInfos = new ArrayList<>();
         for (int i = 0; i < 10; i++) {
-            EventInfo eventInfo = new EventInfo(null, null, null);
+            List<String> attendants = new ArrayList<String>() {{
+                add("grtkachenko@gmail.com");
+                add("grtkachenko@gmail.com");
+                add("grtkachenko@gmail.com");
+                add("grtkachenko@gmail.com");
+                add("grtkachenko@gmail.com");
+                add("grtkachenko@gmail.com");
+                add("grtkachenko@gmail.com");
+                add("grtkachenko@gmail.com");
+                add("grtkachenko@gmail.com");
+                add("grtkachenko@gmail.com");
+                add("grtkachenko@gmail.com");
+                add("grtkachenko@gmail.com");
+                add("grtkachenko@gmail.com");
+                add("grtkachenko@gmail.com");
+                add("grtkachenko@gmail.com");
+                add("grtkachenko@gmail.com");
+                add("grtkachenko@gmail.com");
+                add("grtkachenko@gmail.com");
+                add("grtkachenko@gmail.com");
+                add("grtkachenko@gmail.com");
+                add("grtkachenko@gmail.com");
+                add("grtkachenko@gmail.com");
+                add("grtkachenko@gmail.com");
+                add("grtkachenko@gmail.com");
+                add("grtkachenko@gmail.com");
+                add("grtkachenko@gmail.com");
+                add("grtkachenko@gmail.com");
+            }};
+
+            EventInfo eventInfo = new EventInfo("Пойти поспать", "10 may", attendants, i % 2 == 0);
             eventInfos.add(eventInfo);
         }
-        EventAdapter eventAdapter = new EventAdapter(eventInfos, new View.OnClickListener() {
+        final EventAdapter eventAdapter = new EventAdapter(eventInfos, new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivity(new Intent(MainActivity.this, EventInfoActivity.class));
-
+                Intent intent = new Intent(MainActivity.this, EventInfoActivity.class);
+                intent.putExtra("test", eventInfos.get(recList.getChildAdapterPosition(v)));
+                startActivity(intent);
             }
         });
         AnimationAdapter alphaAdapter = new ScaleInAnimationAdapter(eventAdapter);

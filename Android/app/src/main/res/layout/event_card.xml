@@ -19,12 +19,12 @@
 
     <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="@dimen/card_height">
+        android:layout_height="@dimen/card_height"
+        android:background="@color/semi_transparent_black">
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="@dimen/card_height"
-            android:background="@color/semi_transparent_black"
+            android:layout_height="wrap_content"
             android:orientation="vertical"
             android:padding="5dp">
 
@@ -36,7 +36,7 @@
                 android:singleLine="true"
                 android:text="Пойти поспать"
                 android:textColor="@android:color/white"
-                android:textSize="48dp" />
+                android:textSize="40dp" />
 
             <TextView
                 android:id="@+id/date"
@@ -47,44 +47,16 @@
                 android:textSize="17dp" />
 
 
-            <TextView
-                android:id="@+id/attendant"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:paddingTop="20dp"
-                android:text="grtkachenko@gmail.com"
-                android:textColor="@android:color/white"
-                android:textSize="17dp" />
+        </LinearLayout>
 
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="by.zumzoom@gmail.com"
-                android:textColor="@android:color/white"
-                android:textSize="17dp" />
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="anotnkov@gmail.com"
-                android:textColor="@android:color/white"
-                android:textSize="17dp" />
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="stankev@gmail.com"
-                android:textColor="@android:color/white"
-                android:textSize="17dp" />
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="and 9 others"
-                android:textColor="@android:color/white"
-                android:textSize="15dp" />
-
-
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="30dp"
+            android:layout_marginLeft="12dp"
+            android:orientation="vertical"
+            android:layout_gravity="bottom|left"
+            android:id="@+id/attendants">
         </LinearLayout>
 
         <ImageView
@@ -92,7 +64,8 @@
             android:layout_height="@dimen/audio_size"
             android:layout_gravity="bottom|right"
             android:layout_marginBottom="25dp"
-            android:src="@drawable/audio_white" />
+            android:src="@drawable/audio_white"
+            android:id="@+id/micro"/>
     </FrameLayout>
 
 
