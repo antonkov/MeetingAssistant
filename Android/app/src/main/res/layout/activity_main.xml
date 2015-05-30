@@ -18,16 +18,28 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
+        <TextView
+            android:id="@+id/empty_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:visibility="gone"
+            android:text="No meetings so far"
+            android:textColor="@android:color/darker_gray"
+            android:textSize="20dp"/>
+
         <android.support.v4.widget.SwipeRefreshLayout
             android:id="@+id/swipeToRefreshLayout"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             tools:context=".MainActivity">
 
-            <android.support.v7.widget.RecyclerView
+            <com.gtdev.meetingassistant.views.EmptyRecyclerView
                 android:id="@+id/eventList"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent" />
+
+
         </android.support.v4.widget.SwipeRefreshLayout>
 
         <com.melnykov.fab.FloatingActionButton

@@ -1,6 +1,7 @@
-package com.gtdev.meetingassistant;
+package com.gtdev.meetingassistant.activites;
 
 import android.app.Dialog;
+import android.app.ProgressDialog;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.net.Uri;
@@ -13,11 +14,17 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.gtdev.meetingassistant.R;
+import com.gtdev.meetingassistant.model.EventInfo;
+import com.gtdev.meetingassistant.utils.RestClientHelper;
+import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.skd.androidrecording.audio.AudioPlaybackManager;
 import com.skd.androidrecording.audio.AudioRecordingHandler;
 import com.skd.androidrecording.audio.AudioRecordingThread;
 import com.skd.androidrecording.visualizer.VisualizerView;
 import com.skd.androidrecording.visualizer.renderer.BarGraphRenderer;
+
+import org.apache.http.Header;
 
 import java.io.File;
 
@@ -69,6 +76,20 @@ public class EventInfoActivity extends AppCompatActivity {
                     public void onClick(View v) {
                         stopRecording();
                         dialog.cancel();
+                        final ProgressDialog pd = new ProgressDialog(EventInfoActivity.this);
+                        pd.setMessage("Uploading audio...");
+                        pd.show();
+                        RestClientHelper.uploadAudio(EventInfoActivity.this, MainActivity.userEmail, new File(fileName), new AsyncHttpResponseHandler() {
+                            @Override
+                            public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
+                                pd.cancel();
+                            }
+
+                            @Override
+                            public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error) {
+                                pd.cancel();
+                            }
+                        });
                     }
                 });
                 setupVisualizer(visualizerView);

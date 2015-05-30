@@ -13,7 +13,9 @@
         android:label="Tests for com.skd.androidrecording.test"
         android:targetPackage="com.skd.androidrecording.test" />
 
-    <application>
+    <application
+        android:allowBackup="true"
+        android:label="@string/app_name" >
         <uses-library android:name="android.test.runner" />
     </application>
 
