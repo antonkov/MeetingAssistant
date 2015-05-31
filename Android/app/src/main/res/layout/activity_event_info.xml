@@ -29,7 +29,12 @@
                 android:text="Large Text"
                 android:textColor="@android:color/black"
                 android:textSize="30dp"
+                android:layout_marginLeft="15dp"
+                android:layout_marginRight="15dp"
+                android:layout_marginTop="15dp"
+                android:layout_marginBottom="3dp"
                 android:id="@+id/title" />
+
 
             <TextView
                 android:layout_width="wrap_content"
@@ -37,33 +42,114 @@
                 android:textAppearance="?android:attr/textAppearanceMedium"
                 android:text="Medium Text"
                 android:layout_marginBottom="14dp"
+                android:layout_marginLeft="15dp"
+                android:layout_marginRight="15dp"
+
                 android:textColor="@android:color/darker_gray"
                 android:id="@+id/date" />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1px"
+                android:background="@color/grey_500" />
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
+                android:layout_margin="15dp"
                 android:id="@+id/attendants" />
 
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1px"
+                android:background="@color/grey_500" />
+
             <Button
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Record"
+                android:text="Record meeting"
+                android:layout_margin="15dp"
                 android:id="@+id/recordButton" />
 
-            <Button
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Play"
-                android:id="@+id/playButton"
-                android:visibility="gone"/>
-
-
             <FrameLayout
+                android:id="@+id/playAndSearchLayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <Button
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Download data"
+                    android:layout_margin="15dp"
+                    android:id="@+id/playButton"
+                    android:layout_gravity="left" />
+
+                <Button
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Search by content"
+                    android:layout_margin="15dp"
+                    android:layout_gravity="right"
+                    android:id="@+id/search" />
+
+            </FrameLayout>
+
+
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:id="@+id/playerLayout"
-                android:layout_height="match_parent"></FrameLayout>
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:visibility="gone">
+
+                <TextView
+                    android:id="@+id/songDuration"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:textColor="@android:color/darker_gray"
+                    android:text="duration" />
+
+                <SeekBar
+                    android:id="@+id/seekBar"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_marginTop="30dp"
+                    android:gravity="center_horizontal"
+                    android:orientation="horizontal">
+
+
+                    <ImageButton
+                        android:id="@+id/media_play"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="14dp"
+                        android:src="@android:drawable/ic_media_play" />
+
+                    <ImageButton
+                        android:id="@+id/media_pause"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="14dp"
+                        android:src="@android:drawable/ic_media_pause" />
+
+
+                </LinearLayout>
+            </LinearLayout>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:layout_margin="15dp"
+                android:id="@+id/meetingText"
+                android:textColor="@android:color/darker_gray"
+                />
 
         </LinearLayout>
 

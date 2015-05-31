@@ -3,6 +3,7 @@ package com.gtdev.meetingassistant.utils;
 import android.content.Context;
 import android.util.Base64;
 
+import com.gtdev.meetingassistant.activites.EventInfoActivity;
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
@@ -16,6 +17,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.List;
@@ -81,7 +84,21 @@ public class RestClientHelper {
     public static void uploadAudio(Context context, String eventId, File file, AsyncHttpResponseHandler responseHandler) {
         JSONObject jsonParams = new JSONObject();
         try {
-            String audioString = Base64.encodeToString(FileUtils.readFileToByteArray(file), Base64.DEFAULT);;
+            String audioString = Base64.encodeToString(FileUtils.readFileToByteArray(file), Base64.DEFAULT);
+            byte[] bytes = Base64.decode(audioString, Base64.DEFAULT);
+
+            try {
+                File newFile = new File(EventInfoActivity.getFileName("AUDIO31"));
+                FileOutputStream fileOuputStream = new FileOutputStream(newFile);
+                fileOuputStream.write(bytes);
+                fileOuputStream.flush();
+                fileOuputStream.close();
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
             jsonParams.put("audio", audioString);
         } catch (JSONException e) {
             e.printStackTrace();
@@ -96,5 +113,10 @@ public class RestClientHelper {
             e.printStackTrace();
         }
         put(context, "events/" + eventId, entity, "application/json", responseHandler);
+    }
+
+    public static void getAudio(String eventId, AsyncHttpResponseHandler responseHandler) {
+        RequestParams requestParams = new RequestParams();
+        get("events/" + eventId, requestParams, responseHandler);
     }
 }

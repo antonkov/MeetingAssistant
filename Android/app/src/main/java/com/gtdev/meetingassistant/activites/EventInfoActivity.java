@@ -7,17 +7,23 @@ import android.graphics.Paint;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Base64;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.LinearLayout;
+import android.widget.SeekBar;
 import android.widget.TextView;
 
 import com.gtdev.meetingassistant.R;
 import com.gtdev.meetingassistant.model.EventInfo;
+import com.gtdev.meetingassistant.utils.AudioController;
 import com.gtdev.meetingassistant.utils.RestClientHelper;
 import com.loopj.android.http.AsyncHttpResponseHandler;
+import com.loopj.android.http.JsonHttpResponseHandler;
 import com.skd.androidrecording.audio.AudioPlaybackManager;
 import com.skd.androidrecording.audio.AudioRecordingHandler;
 import com.skd.androidrecording.audio.AudioRecordingThread;
@@ -25,14 +31,19 @@ import com.skd.androidrecording.visualizer.VisualizerView;
 import com.skd.androidrecording.visualizer.renderer.BarGraphRenderer;
 
 import org.apache.http.Header;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.File;
-
-import nl.changer.audiowife.AudioWife;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 
 public class EventInfoActivity extends AppCompatActivity {
     private static String fileName = null;
     public static String FileNameArg = "arg_filename";
+    private AudioController audioController;
 
     private Button recordBtn, playBtn;
     private VisualizerView visualizerView;
@@ -41,9 +52,9 @@ public class EventInfoActivity extends AppCompatActivity {
     private AudioRecordingThread recordingThread;
     private boolean startRecording = true;
 
-    public static String getFileName(boolean isAudio) {
+    public static String getFileName(String name) {
         String storageDir = Environment.getExternalStorageDirectory().getAbsolutePath();
-        return String.format("%s/%s", storageDir, "AUDIO_FILE_NAME");
+        return String.format("%s/%s", storageDir, name);
     }
 
     @Override
@@ -61,7 +72,7 @@ public class EventInfoActivity extends AppCompatActivity {
             }
         });
 
-        fileName = getFileName(true);
+        fileName = getFileName("AUDIO");
 
         recordBtn = (Button) findViewById(R.id.recordButton);
         recordBtn.setOnClickListener(new View.OnClickListener() {
@@ -79,19 +90,25 @@ public class EventInfoActivity extends AppCompatActivity {
                         final ProgressDialog pd = new ProgressDialog(EventInfoActivity.this);
                         pd.setMessage("Uploading audio...");
                         pd.show();
-                        String id = MainActivity.eventInfos.get(getIntent().getIntExtra("event_id", 0)).id;
-
-                        RestClientHelper.uploadAudio(EventInfoActivity.this, id, new File(fileName), new AsyncHttpResponseHandler() {
+                        new Handler().postDelayed(new Runnable() {
                             @Override
-                            public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
-                                pd.cancel();
-                            }
+                            public void run() {
+                                String id = MainActivity.eventInfos.get(getIntent().getIntExtra("event_id", 0)).id;
 
-                            @Override
-                            public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error) {
-                                pd.cancel();
+                                RestClientHelper.uploadAudio(EventInfoActivity.this, id, new File(fileName), new AsyncHttpResponseHandler() {
+                                    @Override
+                                    public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
+                                        pd.cancel();
+                                    }
+
+                                    @Override
+                                    public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error) {
+                                        pd.cancel();
+                                    }
+                                });
                             }
-                        });
+                        }, 1000);
+
                     }
                 });
                 setupVisualizer(visualizerView);
@@ -105,9 +122,58 @@ public class EventInfoActivity extends AppCompatActivity {
         playBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                final ProgressDialog pd = new ProgressDialog(EventInfoActivity.this);
+                pd.setMessage("Downloading audio...");
+                pd.show();
+                RestClientHelper.getAudio(MainActivity.eventInfos.get(getIntent().getIntExtra("event_id", 0)).id, new JsonHttpResponseHandler() {
+                    @Override
+                    public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                        final String fileName = "AUDIO";
+                        try {
+                            String audio = response.getString("audio");
+                            ((TextView) findViewById(R.id.meetingText)).setText(response.getString("text"));
+                            byte[] bytes = Base64.decode(audio, Base64.DEFAULT);
 
-                AudioWife.getInstance().init(EventInfoActivity.this, Uri.fromFile(new File(fileName)))
-                        .useDefaultUi((android.view.ViewGroup) findViewById(R.id.playerLayout), getLayoutInflater());
+                            try {
+                                FileOutputStream fileOuputStream = new FileOutputStream(getFileName(fileName));
+                                fileOuputStream.write(bytes);
+                                fileOuputStream.flush();
+                                fileOuputStream.close();
+                            } catch (FileNotFoundException e) {
+                                e.printStackTrace();
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+                            ;
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                        new Handler().postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                audioController = new AudioController(EventInfoActivity.this, Uri.fromFile(new File(getFileName(fileName))),
+                                        (ImageButton) findViewById(R.id.media_play), (ImageButton) findViewById(R.id.media_pause),
+                                        (TextView) findViewById(R.id.songDuration), (SeekBar) findViewById(R.id.seekBar));
+                                playBtn.setEnabled(false);
+                                findViewById(R.id.playerLayout).setVisibility(View.VISIBLE);
+                                pd.cancel();
+                            }
+                        }, 1000);
+
+                    }
+
+                    @Override
+                    public void onSuccess(int statusCode, Header[] headers, JSONArray timeline) {
+                        pd.cancel();
+                    }
+
+                    @Override
+                    public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
+                        super.onFailure(statusCode, headers, throwable, errorResponse);
+                        pd.cancel();
+                    }
+                });
+
             }
         });
         initViews(MainActivity.eventInfos.get(getIntent().getIntExtra("event_id", 0)));
@@ -125,11 +191,12 @@ public class EventInfoActivity extends AppCompatActivity {
             linearLayout.addView(textView);
         }
         if (eventInfo.recorded) {
-            playBtn.setVisibility(View.VISIBLE);
+            findViewById(R.id.playAndSearchLayout).setVisibility(View.VISIBLE);
             recordBtn.setVisibility(View.GONE);
         } else {
             recordBtn.setVisibility(View.VISIBLE);
-            playBtn.setVisibility(View.GONE);
+            findViewById(R.id.playerLayout).setVisibility(View.GONE);
+            findViewById(R.id.playAndSearchLayout).setVisibility(View.GONE);
         }
 
     }
@@ -177,7 +244,8 @@ public class EventInfoActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onRecordSuccess() {}
+            public void onRecordSuccess() {
+            }
 
             @Override
             public void onRecordingError() {
