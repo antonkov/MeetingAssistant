@@ -121,7 +121,7 @@ public class AddEventActivity extends AppCompatActivity implements DatePickerDia
 
     @Override
     public void onDateSet(DatePickerDialog datePickerDialog, int year, int month, int day) {
-        ((TextView) findViewById(R.id.dateTextView)).setText("" + day + "/" + month + "/" + year);
+        ((TextView) findViewById(R.id.dateTextView)).setText("" + day + "/" + (month + 1) + "/" + year);
     }
 
     @Override
