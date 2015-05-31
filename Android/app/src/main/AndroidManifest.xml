@@ -26,15 +26,8 @@
             android:name=".activites.EventInfoActivity"
             android:label="@string/title_activity_event_info" />
         <activity
-            android:name=".activites.EventInfoActivity"
-            android:label="@string/title_activity_event_info" />
-        <activity
             android:name=".activites.SignInActivity"
             android:label="@string/title_activity_sign_in" >
-        </activity>
-        <activity
-            android:name=".activites.SearchActivity"
-            android:label="@string/title_activity_search" >
         </activity>
     </application>
 
