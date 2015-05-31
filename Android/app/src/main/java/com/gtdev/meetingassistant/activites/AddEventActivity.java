@@ -126,6 +126,11 @@ public class AddEventActivity extends AppCompatActivity implements DatePickerDia
 
     @Override
     public void onTimeSet(RadialPickerLayout view, int hourOfDay, int minute) {
-        ((TextView) findViewById(R.id.timeTextView)).setText("" + hourOfDay + ":" + minute);
+        ((TextView) findViewById(R.id.timeTextView)).setText(
+                "" + processTimeAmount(hourOfDay) + ":" + processTimeAmount(minute));
+    }
+
+    private String processTimeAmount(int value) {
+        return value < 10 ? ("0" + value) : ("" + value);
     }
 }
