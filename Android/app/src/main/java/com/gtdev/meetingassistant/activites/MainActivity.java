@@ -42,7 +42,7 @@ public class MainActivity extends AppCompatActivity {
         public void onClick(View v) {
             Intent intent = new Intent(MainActivity.this, EventInfoActivity.class);
             intent.putExtra("event_id", recList.getChildAdapterPosition(v));
-            startActivity(intent);
+            startActivityForResult(intent, 2);
         }
     });
     private LinearLayoutManager llm;
@@ -122,6 +122,9 @@ public class MainActivity extends AppCompatActivity {
                     eventAdapter.notifyItemInserted(0);
                     recList.scrollToPosition(0);
                 }
+                break;
+            case 2:
+                eventAdapter.notifyDataSetChanged();
                 break;
         }
     }

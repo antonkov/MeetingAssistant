@@ -6,6 +6,7 @@ import android.util.Base64;
 import com.gtdev.meetingassistant.activites.EventInfoActivity;
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.AsyncHttpResponseHandler;
+import com.loopj.android.http.JsonHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
 import com.loopj.android.http.ResponseHandlerInterface;
 
@@ -118,5 +119,12 @@ public class RestClientHelper {
     public static void getAudio(String eventId, AsyncHttpResponseHandler responseHandler) {
         RequestParams requestParams = new RequestParams();
         get("events/" + eventId, requestParams, responseHandler);
+    }
+
+    public static void getQueryResult(String eventId, String query, JsonHttpResponseHandler jsonHttpResponseHandler) {
+        RequestParams requestParams = new RequestParams();
+        requestParams.put("id", eventId);
+        requestParams.put("query", query);
+        get("events/query/", requestParams, jsonHttpResponseHandler);
     }
 }

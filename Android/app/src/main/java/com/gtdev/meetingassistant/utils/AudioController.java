@@ -92,4 +92,9 @@ public class AudioController {
         mediaPlayer.pause();
     }
 
+    public void startFrom(int offset) {
+        mediaPlayer.seekTo(offset);
+        play();
+    }
+
 }

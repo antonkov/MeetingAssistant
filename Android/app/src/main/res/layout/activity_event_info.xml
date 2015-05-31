@@ -91,7 +91,8 @@
                     android:text="Search by content"
                     android:layout_margin="15dp"
                     android:layout_gravity="right"
-                    android:id="@+id/search" />
+                    android:id="@+id/search"
+                    android:enabled="false"/>
 
             </FrameLayout>
 
@@ -148,6 +149,7 @@
                 android:textAppearance="?android:attr/textAppearanceMedium"
                 android:layout_margin="15dp"
                 android:id="@+id/meetingText"
+                android:textIsSelectable="true"
                 android:textColor="@android:color/darker_gray"
                 />
 

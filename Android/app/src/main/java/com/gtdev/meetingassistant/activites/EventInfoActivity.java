@@ -1,7 +1,9 @@
 package com.gtdev.meetingassistant.activites;
 
+import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.net.Uri;
@@ -12,7 +14,9 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Base64;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.SeekBar;
@@ -45,7 +49,7 @@ public class EventInfoActivity extends AppCompatActivity {
     public static String FileNameArg = "arg_filename";
     private AudioController audioController;
 
-    private Button recordBtn, playBtn;
+    private Button recordBtn, searchBtn, playBtn;
     private VisualizerView visualizerView;
     private AudioPlaybackManager playbackManager;
 
@@ -73,7 +77,97 @@ public class EventInfoActivity extends AppCompatActivity {
         });
 
         fileName = getFileName("AUDIO");
+        searchBtn = (Button) findViewById(R.id.search);
+        searchBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                final AlertDialog.Builder alert = new AlertDialog.Builder(EventInfoActivity.this);
 
+
+                final EditText edittext= new EditText(EventInfoActivity.this);
+                alert.setMessage("Enter Your Query");
+                alert.setTitle("Content search");
+
+                alert.setView(edittext);
+
+                alert.setPositiveButton("Search", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int whichButton) {
+                        //What ever you want to do with the value
+                        String query = edittext.getText().toString();
+                        final ProgressDialog pd = new ProgressDialog(EventInfoActivity.this);
+                        pd.setMessage("Processing query...");
+                        RestClientHelper.getQueryResult(MainActivity.eventInfos.get(getIntent().getIntExtra("event_id", 0)).id, query, new JsonHttpResponseHandler() {
+                            @Override
+                            public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                                pd.cancel();
+
+                            }
+
+                            @Override
+                            public void onSuccess(int statusCode, Header[] headers, final JSONArray timeline) {
+                                pd.cancel();
+
+                                AlertDialog.Builder builderSingle = new AlertDialog.Builder(
+                                        EventInfoActivity.this);
+                                builderSingle.setTitle("Select One Snippet");
+                                final ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(
+                                        EventInfoActivity.this,
+                                        android.R.layout.select_dialog_singlechoice);
+                                for (int i = 0; i < timeline.length(); i++) {
+                                    try {
+                                        arrayAdapter.add(timeline.getJSONObject(i).getString("text"));
+                                    } catch (JSONException e) {
+                                        e.printStackTrace();
+                                    }
+                                }
+                                builderSingle.setNegativeButton("Cancel",
+                                        new DialogInterface.OnClickListener() {
+
+                                            @Override
+                                            public void onClick(DialogInterface dialog, int which) {
+                                                dialog.dismiss();
+                                            }
+                                        });
+
+                                builderSingle.setAdapter(arrayAdapter,
+                                        new DialogInterface.OnClickListener() {
+
+                                            @Override
+                                            public void onClick(DialogInterface dialog, int which) {
+                                                String strName = arrayAdapter.getItem(which);
+                                                try {
+                                                    int offset = Integer.parseInt(timeline.getJSONObject(which).getString("offset"));
+                                                    audioController.startFrom(offset);
+                                                } catch (JSONException e) {
+                                                    e.printStackTrace();
+                                                }
+                                            }
+                                        });
+                                builderSingle.show();
+                            }
+
+                            @Override
+                            public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
+                                super.onFailure(statusCode, headers, throwable, errorResponse);
+                                pd.cancel();
+                            }
+                        });
+
+
+                        pd.show();
+
+                    }
+                });
+
+                alert.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int whichButton) {
+                        dialog.cancel();
+                    }
+                });
+
+                alert.show();
+            }
+        });
         recordBtn = (Button) findViewById(R.id.recordButton);
         recordBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -99,11 +193,15 @@ public class EventInfoActivity extends AppCompatActivity {
                                     @Override
                                     public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
                                         pd.cancel();
+                                        MainActivity.eventInfos.get(getIntent().getIntExtra("event_id", 0)).recorded = true;
+                                        initViews(MainActivity.eventInfos.get(getIntent().getIntExtra("event_id", 0)));
                                     }
 
                                     @Override
                                     public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error) {
                                         pd.cancel();
+                                        MainActivity.eventInfos.get(getIntent().getIntExtra("event_id", 0)).recorded = true;
+                                        initViews(MainActivity.eventInfos.get(getIntent().getIntExtra("event_id", 0)));
                                     }
                                 });
                             }
@@ -123,7 +221,7 @@ public class EventInfoActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 final ProgressDialog pd = new ProgressDialog(EventInfoActivity.this);
-                pd.setMessage("Downloading audio...");
+                pd.setMessage("Downloading data...");
                 pd.show();
                 RestClientHelper.getAudio(MainActivity.eventInfos.get(getIntent().getIntExtra("event_id", 0)).id, new JsonHttpResponseHandler() {
                     @Override
@@ -155,6 +253,7 @@ public class EventInfoActivity extends AppCompatActivity {
                                         (ImageButton) findViewById(R.id.media_play), (ImageButton) findViewById(R.id.media_pause),
                                         (TextView) findViewById(R.id.songDuration), (SeekBar) findViewById(R.id.seekBar));
                                 playBtn.setEnabled(false);
+                                searchBtn.setEnabled(true);
                                 findViewById(R.id.playerLayout).setVisibility(View.VISIBLE);
                                 pd.cancel();
                             }
