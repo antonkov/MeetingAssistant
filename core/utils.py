@@ -80,12 +80,24 @@ def find_start(text_filename, phrase, result_filename):
     for i, (o, w) in enumerate(zip(offs, text)):
         if phrase_words[0] == w:
             if ' '.join(text[i:i+k]) == phrase:
-                res.append(o)
+                res.append(i)
+    snippets, times = [], []
+    n = len(text)
+    m = 2
+    for idx in res:
+        st_idx = max(0, idx - m)
+        times.append(offs[st_idx])
+        en_idx = min(idx + m + k, n)
+        snippets.append(' '.join(text[st_idx:en_idx]))
+
     with open(result_filename, 'w') as f:
-        for x in res:
-            f.write(str(x))
-            f.write(' ')
+        f.write(str(len(snippets)))
         f.write('\n')
+        for snip, time in zip(snippets, times):
+            f.write(str(time))
+            f.write('\n')
+            f.write(snip)
+            f.write('\n')
 
 #offs, content = sound_to_text(open('test.mp4', 'rb'))
 #print(offs, '\n', content)
