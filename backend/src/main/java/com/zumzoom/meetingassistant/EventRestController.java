@@ -33,7 +33,6 @@ public class EventRestController {
 
     @RequestMapping(method=RequestMethod.POST)
     public @ResponseBody Event handleCreateEvent(@RequestBody Event event){
-        System.out.println(event.getAudio().length);
         return repository.save(event);
     }
 
@@ -78,7 +77,7 @@ public class EventRestController {
                     update.setText(text);
                     update.sslolOffsets(offs);
                 } else {
-                    update.setText(text);
+                    update.setText("");
                     update.sslolOffsets(new ArrayList<Integer>());
                 }
             } catch (IOException | InterruptedException e) {
@@ -94,8 +93,34 @@ public class EventRestController {
         return repository.save(update);
     }
 
+    class Query {
+        public Query(Integer offset, String text) {
+            this.text = text;
+            this.offset = offset;
+        }
+
+        public String getText() {
+            return text;
+        }
+
+        public void setText(String text) {
+            this.text = text;
+        }
+
+        public Integer getOffset() {
+            return offset;
+        }
+
+        public void setOffset(Integer offset) {
+            this.offset = offset;
+        }
+
+        String text;
+        Integer offset;
+    }
+
     @RequestMapping(method=RequestMethod.GET, value="query")
-    public @ResponseBody List<Integer> handleQueryEvent(@RequestParam(value = "query") String query,
+    public @ResponseBody List<Query> handleQueryEvent(@RequestParam(value = "query") String query,
                                                       @RequestParam(value = "id") String id){
         Event event = repository.findOne(id);
         if(event == null)
@@ -106,7 +131,7 @@ public class EventRestController {
             for(Integer off : event.gglolOffsets()) pw.print(off + " ");
             pw.close();
 
-            Process p = Runtime.getRuntime().exec("python3 find_start.py data.txt \\\"" + query + "\\\" res.txt");
+            Process p = Runtime.getRuntime().exec(new String[]{"python3", "find_start.py", "data.txt", query, "res.txt"});
             int res = p.waitFor();
             Reader reader = new InputStreamReader(p.getErrorStream());
             int ch;
@@ -119,17 +144,12 @@ public class EventRestController {
             reader.close();
 
             BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream("res.txt")));
-            String offsets = br.readLine();
-            String[] soffs = offsets.split(" ");
-            ArrayList<Integer> offs = new ArrayList<>();
-            for (String off : soffs) {
-                try {
-                    offs.add(Integer.parseInt(off));
-                } catch (NumberFormatException e) {
-                    e.printStackTrace();
-                }
+            int n = Integer.parseInt(br.readLine());
+            ArrayList<Query> queries = new ArrayList<>();
+            for(int i = 0; i < n; ++i){
+                queries.add(new Query(Integer.parseInt(br.readLine()), br.readLine()));
             }
-            return offs;
+            return queries;
         } catch (IOException | InterruptedException e) {
             e.printStackTrace();
         }
