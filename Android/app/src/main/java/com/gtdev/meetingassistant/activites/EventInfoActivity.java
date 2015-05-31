@@ -28,6 +28,8 @@ import com.gtdev.meetingassistant.utils.AudioController;
 import com.gtdev.meetingassistant.utils.RestClientHelper;
 import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.loopj.android.http.JsonHttpResponseHandler;
+import com.nispok.snackbar.Snackbar;
+import com.nispok.snackbar.SnackbarManager;
 import com.skd.androidrecording.audio.AudioPlaybackManager;
 import com.skd.androidrecording.audio.AudioRecordingHandler;
 import com.skd.androidrecording.audio.AudioRecordingThread;
@@ -226,6 +228,20 @@ public class EventInfoActivity extends AppCompatActivity {
                 RestClientHelper.getAudio(MainActivity.eventInfos.get(getIntent().getIntExtra("event_id", 0)).id, new JsonHttpResponseHandler() {
                     @Override
                     public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                        try {
+                            if (!response.getBoolean("hasAudio")) {
+                                pd.cancel();
+                                SnackbarManager.show(
+                                        Snackbar.with(EventInfoActivity.this)
+                                                .text("Not processed yet. Try in a minute")
+                                                .duration(Snackbar.SnackbarDuration.LENGTH_LONG));
+
+                                return;
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+
                         final String fileName = "AUDIO";
                         try {
                             String audio = response.getString("audio");

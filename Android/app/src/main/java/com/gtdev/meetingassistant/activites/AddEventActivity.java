@@ -9,7 +9,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.fourmob.datetimepicker.date.DatePickerDialog;
 import com.gtdev.meetingassistant.R;
@@ -98,13 +97,13 @@ public class AddEventActivity extends AppCompatActivity implements DatePickerDia
                 RestClientHelper.createEvent(AddEventActivity.this, titleTextView.getText().toString(), dateTextView.getText().toString(), users, new AsyncHttpResponseHandler() {
                     @Override
                     public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
-                        Toast.makeText(AddEventActivity.this, "Success " + statusCode, Toast.LENGTH_SHORT).show();
+//                        Toast.makeText(AddEventActivity.this, "Success " + statusCode, Toast.LENGTH_SHORT).show();
                         goToMainActivity(users);
                     }
 
                     @Override
                     public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error) {
-                        Toast.makeText(AddEventActivity.this, "Failure " + statusCode, Toast.LENGTH_SHORT).show();
+//                        Toast.makeText(AddEventActivity.this, "Failure " + statusCode, Toast.LENGTH_SHORT).show();
                         goToMainActivity(users);
                     }
                 });

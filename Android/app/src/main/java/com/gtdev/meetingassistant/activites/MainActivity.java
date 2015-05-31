@@ -20,6 +20,8 @@ import com.gtdev.meetingassistant.utils.RestClientHelper;
 import com.gtdev.meetingassistant.views.EmptyRecyclerView;
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.melnykov.fab.FloatingActionButton;
+import com.nispok.snackbar.Snackbar;
+import com.nispok.snackbar.SnackbarManager;
 
 import org.apache.http.Header;
 import org.json.JSONArray;
@@ -184,6 +186,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onSuccess(int statusCode, Header[] headers, JSONArray timeline) {
                 swipeLayout.setRefreshing(false);
+                int beforeCount = eventInfos.size();
                 eventInfos.clear();
                 for (int i = 0; i < timeline.length(); i++) {
                     try {
@@ -202,6 +205,10 @@ public class MainActivity extends AppCompatActivity {
                         e.printStackTrace();
                     }
                 }
+                SnackbarManager.show(
+                        Snackbar.with(MainActivity.this)
+                                .text("" + (eventInfos.size() - beforeCount) + " items updated")
+                                .duration(Snackbar.SnackbarDuration.LENGTH_SHORT));
                 Collections.reverse(eventInfos);
                 eventAdapter.notifyDataSetChanged();
 
