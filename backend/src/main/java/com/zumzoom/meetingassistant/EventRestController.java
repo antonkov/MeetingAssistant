@@ -1,12 +1,8 @@
 package com.zumzoom.meetingassistant;
 
-import org.python.core.PyByteArray;
-import org.python.core.PyObject;
-import org.python.core.PyTuple;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-import org.python.util.PythonInterpreter;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -37,6 +33,7 @@ public class EventRestController {
 
     @RequestMapping(method=RequestMethod.POST)
     public @ResponseBody Event handleCreateEvent(@RequestBody Event event){
+        System.out.println(event.getAudio().length);
         return repository.save(event);
     }
 
@@ -59,33 +56,84 @@ public class EventRestController {
                 os.write(event.getAudio());
                 os.close();
 
-                Process p = Runtime.getRuntime().exec("python sound_to_text.py audio.dat res.txt");
-                p.waitFor();
+                Process p = Runtime.getRuntime().exec("python3 sound_to_text.py audio.dat res.txt");
+                int res = p.waitFor();
+                Reader reader = new InputStreamReader(p.getErrorStream());
+                int ch;
+                while ((ch = reader.read()) != -1)
+                    System.out.print((char) ch);
+                reader.close();
+                reader = new InputStreamReader(p.getInputStream());
+                while ((ch = reader.read()) != -1)
+                    System.out.print((char) ch);
+                reader.close();
+
                 BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream("res.txt")));
                 String text = br.readLine();
-                String[] soffs = br.readLine().split(" ");
-                ArrayList<Integer> offs = new ArrayList<>();
-                for (String off : soffs) offs.add(Integer.parseInt(off));
-                update.setText(text);
-                update.sslolOffsets(offs);
+                if(!text.isEmpty()) {
+                    String offsets = br.readLine();
+                    String[] soffs = offsets.split(" ");
+                    ArrayList<Integer> offs = new ArrayList<>();
+                    for (String off : soffs) offs.add(Integer.parseInt(off));
+                    update.setText(text);
+                    update.sslolOffsets(offs);
+                } else {
+                    update.setText(text);
+                    update.sslolOffsets(new ArrayList<Integer>());
+                }
             } catch (IOException | InterruptedException e) {
                 e.printStackTrace();
             }
-            PythonInterpreter interpreter = new PythonInterpreter();
-            interpreter.exec("import .");
-            PyObject someFunc = interpreter.get("sound_to_text");
-            PyTuple result = (PyTuple) someFunc.__call__(new PyByteArray(event.getAudio()));
-            Object[] tmp = result.toArray();
-            System.out.println((String) tmp[1]);
         }
         if(event.getDate() != null)
             update.setDate(event.getDate());
-        if(event.getText() != null)
-            update.setText(event.getText());
         if(event.getTitle() != null)
             update.setTitle(event.getTitle());
         if(event.getUsers() != null)
             update.setUsers(event.getUsers());
         return repository.save(update);
     }
+
+    @RequestMapping(method=RequestMethod.GET, value="query")
+    public @ResponseBody List<Integer> handleQueryEvent(@RequestParam(value = "query") String query,
+                                                      @RequestParam(value = "id") String id){
+        Event event = repository.findOne(id);
+        if(event == null)
+            throw new ResourceNotFoundException();
+        try {
+            PrintWriter pw = new PrintWriter(new FileOutputStream("./data.txt"));
+            pw.println(event.getText());
+            for(Integer off : event.gglolOffsets()) pw.print(off + " ");
+            pw.close();
+
+            Process p = Runtime.getRuntime().exec("python3 find_start.py data.txt \\\"" + query + "\\\" res.txt");
+            int res = p.waitFor();
+            Reader reader = new InputStreamReader(p.getErrorStream());
+            int ch;
+            while ((ch = reader.read()) != -1)
+                System.out.print((char) ch);
+            reader.close();
+            reader = new InputStreamReader(p.getInputStream());
+            while ((ch = reader.read()) != -1)
+                System.out.print((char) ch);
+            reader.close();
+
+            BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream("res.txt")));
+            String offsets = br.readLine();
+            String[] soffs = offsets.split(" ");
+            ArrayList<Integer> offs = new ArrayList<>();
+            for (String off : soffs) {
+                try {
+                    offs.add(Integer.parseInt(off));
+                } catch (NumberFormatException e) {
+                    e.printStackTrace();
+                }
+            }
+            return offs;
+        } catch (IOException | InterruptedException e) {
+            e.printStackTrace();
+        }
+        return new ArrayList<>();
+    }
+
 }
